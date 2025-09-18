@@ -1,7 +1,7 @@
 // Application constants
 export const APP_CONSTANTS = {
-  // API endpoints
   API_BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:8080/api',
+
   
   // Storage keys
   STORAGE_KEYS: {

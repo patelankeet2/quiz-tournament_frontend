@@ -16,18 +16,18 @@ const QuizList = () => {
   }, []);
 
    const loadQuizzes = async () => {
-    try {
-      setLoading(true);
-      const data = await quizService.getAllQuizzes();
-      const arr = Array.isArray(data) ? data : (data.quizzes || []);
-      setQuizzes(arr);
-    } catch (error) {
-      setError('Failed to load quizzes');
-      console.error('Error loading quizzes:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const data = await quizService.getAllQuizzes();
+    const arr = Array.isArray(data) ? data : (data.quizzes || []);
+    setQuizzes(arr);
+  } catch (error) {
+    setError('Failed to load quizzes');
+    console.error('Error loading quizzes:', error);
+  } finally {
+    setLoading(false);
+  }
+};
 
 
   const handleDelete = async (id) => {

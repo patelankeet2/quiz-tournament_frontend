@@ -22,20 +22,20 @@ export const QuizProvider = ({ children }) => {
 
   // Load all quizzes
     const loadAllQuizzes = async () => {
-    try {
-      setLoading(true);
-      const data = await quizService.getAllQuizzes();
-      const arr = Array.isArray(data) ? data : (data.quizzes || []);
-      setQuizzes(arr);
-      return arr;
-    } catch (error) {
-      setError('Failed to load quizzes');
-      console.error('Error loading quizzes:', error);
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setLoading(true);
+    const data = await quizService.getAllQuizzes();
+    const arr = Array.isArray(data) ? data : (data.quizzes || []);
+    setQuizzes(arr);
+    return arr;
+  } catch (error) {
+    setError('Failed to load quizzes');
+    console.error('Error loading quizzes:', error);
+    throw error;
+  } finally {
+    setLoading(false);
+  }
+};
 
 
   // Load user-specific quiz data
