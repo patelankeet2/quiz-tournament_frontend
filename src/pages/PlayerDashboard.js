@@ -3,57 +3,70 @@ import { quizService } from '../services/quiz';
 import QuizCard from '../components/Player/QuizCard';
 import QuizProgress from '../components/Player/QuizProgress';
 import QuizRecommendations from '../components/Player/QuizRecommendations';
+import LoadingSpinner from '../components/Common/LoadingSpinner';
+import ErrorMessage from '../components/Common/ErrorMessage';
 import '../styles/Player.css';
 
 const PlayerDashboard = () => {
-  const [activeTab, setActiveTab] = useState('available');
+  const [activeTab, setActiveTab] = useState('ongoing');
   const [quizzes, setQuizzes] = useState({ ongoing: [], upcoming: [], past: [] });
   const [history, setHistory] = useState([]);
   const [recommendations, setRecommendations] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  useEffect(() => {
+ useEffect(() => {
     loadData();
   }, []);
 
   const loadData = async () => {
     try {
       setLoading(true);
+      setError('');
+      
       const [statusData, historyData, recData] = await Promise.all([
-        quizService.getQuizStatus(),
-        quizService.getUserHistory(),
-        quizService.getRecommendations()
+        quizService.getQuizStatus().catch(err => ({ ongoing: [], upcoming: [], past: [] })),
+        quizService.getUserHistory().catch(err => []),
+        quizService.getRecommendations().catch(err => null)
       ]);
       
-      setQuizzes(statusData);
-      setHistory(historyData);
+       setQuizzes({
+        ongoing: statusData.ongoing || statusData.active || [],
+        upcoming: statusData.upcoming || [],
+        past: statusData.past || statusData.completed || []
+      });
+      
+      setHistory(Array.isArray(historyData) ? historyData : []);
       setRecommendations(recData);
     } catch (error) {
       console.error('Error loading data:', error);
+      setError('Failed to load dashboard data. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const getQuizzesForTab = () => {
+
+    const getQuizzesForTab = () => {
     switch (activeTab) {
       case 'ongoing': return quizzes.ongoing;
       case 'upcoming': return quizzes.upcoming;
       case 'past': return quizzes.past;
       case 'history': return history;
-      case 'recommended': return recommendations?.recommendedQuizzes || [];
+      case 'recommended': return recommendations?.recommendedQuizzes || recommendations?.quizzes || [];
       default: return [];
     }
   };
 
-  if (loading) return <div className="loading">Loading dashboard...</div>;
+  if (loading) return <LoadingSpinner text="Loading dashboard..." />;
+  if (error) return <ErrorMessage message={error} onRetry={loadData} />;
 
   return (
     <div className="player-dashboard">
       <div className="dashboard-header">
         <h1>Player Dashboard</h1>
         <QuizProgress history={history} />
-      </div>
+      </div>    
 
       <div className="dashboard-tabs">
         <button

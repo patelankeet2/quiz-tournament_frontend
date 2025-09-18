@@ -82,37 +82,37 @@ const RegisterPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  if (!validateForm()) return;
+
+  setIsSubmitting(true);
+  setAuthError('');
+
+  try {
+    // Register the user
+    await authService.register(formData);
     
-    if (!validateForm()) return;
+    // Auto-login after registration
+    const loginResp = await authService.login({
+      username: formData.username,
+      password: formData.password
+    });
     
-    setIsSubmitting(true);
-    setAuthError('');
-    
-    try {
-      const user = await authService.register(formData);
-      
-           const loginResp = await authService.login({
-        username: formData.username,
-        password: formData.password
-      });
-      const token = loginResp.token;
-      localStorage.setItem('token', token);
+    const token = loginResp.token;
+    localStorage.setItem('token', token);
 
-      // fetch full user profile
-      const profile = await authService.getProfile();
-      login(profile, token);
+    // Fetch full user profile
+    const profile = await authService.getProfile();
+    login(profile, token);
 
-      navigate('/dashboard');
-
-
-    } catch (error) {
-      setAuthError(error.response?.data?.error || 'Registration failed. Please try again.');
-      console.error('Registration error:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    navigate('/dashboard');
+  } catch (error) {
+    setAuthError(error.response?.data?.error || 'Registration failed. Please try again.');
+    console.error('Registration error:', error);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="auth-container">

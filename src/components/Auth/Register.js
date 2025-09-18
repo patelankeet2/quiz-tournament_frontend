@@ -92,29 +92,29 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
   e.preventDefault();
-  
   if (!validateForm()) return;
-  
+
   setIsSubmitting(true);
   setAuthError('');
-  
+
   try {
-    const user = await authService.register(formData);
+    // Register the user
+    await authService.register(formData);
     
-    // Auto-login after successful registration
+    // Auto-login after registration
     const loginResp = await authService.login({
       username: formData.username,
       password: formData.password
     });
+    
     const token = loginResp.token;
     localStorage.setItem('token', token);
 
-    // fetch full user profile
+    // Fetch full user profile
     const profile = await authService.getProfile();
     login(profile, token);
 
     navigate('/dashboard');
-
   } catch (error) {
     setAuthError(error.response?.data?.error || 'Registration failed. Please try again.');
     console.error('Registration error:', error);

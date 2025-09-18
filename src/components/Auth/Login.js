@@ -59,16 +59,17 @@ const Login = () => {
   setIsSubmitting(true);
   setAuthError('');
   try {
-    const authResp = await authService.login(formData); // { token, role }
+    const authResp = await authService.login(formData);
     const token = authResp.token;
-    // store token so subsequent API call includes it via interceptor
+    
+    // Store token for API requests
     localStorage.setItem('token', token);
 
-    // fetch full user profile and then set context
+    // Fetch full user profile
     const user = await authService.getProfile();
     login(user, token);
 
-    navigate(authResp.role === 'ADMIN' ? '/admin' : '/dashboard');
+    navigate(user.role === 'ADMIN' ? '/admin' : '/dashboard');
   } catch (error) {
     setAuthError(error.response?.data?.error || 'Login failed. Please check your credentials.');
     console.error('Login error:', error);

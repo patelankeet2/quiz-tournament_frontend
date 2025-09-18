@@ -20,14 +20,14 @@ export const QuizProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Load all quizzes
-    const loadAllQuizzes = async () => {
+  const loadAllQuizzes = async () => {
   try {
     setLoading(true);
     const data = await quizService.getAllQuizzes();
-    const arr = Array.isArray(data) ? data : (data.quizzes || []);
-    setQuizzes(arr);
-    return arr;
+    // Handle both array and object response formats
+    const quizzesArray = Array.isArray(data) ? data : (data.quizzes || []);
+    setQuizzes(quizzesArray);
+    return quizzesArray;
   } catch (error) {
     setError('Failed to load quizzes');
     console.error('Error loading quizzes:', error);
