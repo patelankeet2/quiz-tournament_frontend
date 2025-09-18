@@ -52,20 +52,23 @@ const LoginPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-    
+
     setIsSubmitting(true);
     setAuthError('');
-    
     try {
-      const response = await authService.login(formData);
-      login(response, response.token);
-      
-      // Redirect based on role
-      navigate(response.role === 'ADMIN' ? '/admin' : '/dashboard');
+      const authResp = await authService.login(formData); // { token, role }
+      const token = authResp.token;
+      // store token so subsequent API call includes it via interceptor
+      localStorage.setItem('token', token);
+
+      // fetch full user profile and then set context
+      const user = await authService.getProfile();
+      login(user, token);
+
+      navigate(authResp.role === 'ADMIN' ? '/admin' : '/dashboard');
     } catch (error) {
       setAuthError(error.response?.data?.error || 'Login failed. Please check your credentials.');
       console.error('Login error:', error);
@@ -73,6 +76,7 @@ const LoginPage = () => {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <div className="auth-container">

@@ -92,14 +92,20 @@ const RegisterPage = () => {
     try {
       const user = await authService.register(formData);
       
-      // Auto-login after successful registration
-      const loginResponse = await authService.login({
+           const loginResp = await authService.login({
         username: formData.username,
         password: formData.password
       });
-      
-      login(loginResponse, loginResponse.token);
+      const token = loginResp.token;
+      localStorage.setItem('token', token);
+
+      // fetch full user profile
+      const profile = await authService.getProfile();
+      login(profile, token);
+
       navigate('/dashboard');
+
+
     } catch (error) {
       setAuthError(error.response?.data?.error || 'Registration failed. Please try again.');
       console.error('Registration error:', error);
@@ -156,7 +162,7 @@ const RegisterPage = () => {
             <input
               type="text"
               id="username"
-              name="username"
+              name="us  ername"
               value={formData.username}
               onChange={handleChange}
               className={errors.username ? 'error' : ''}

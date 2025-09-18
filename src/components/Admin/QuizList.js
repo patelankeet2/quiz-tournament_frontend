@@ -15,11 +15,12 @@ const QuizList = () => {
     loadQuizzes();
   }, []);
 
-  const loadQuizzes = async () => {
+   const loadQuizzes = async () => {
     try {
       setLoading(true);
       const data = await quizService.getAllQuizzes();
-      setQuizzes(data);
+      const arr = Array.isArray(data) ? data : (data.quizzes || []);
+      setQuizzes(arr);
     } catch (error) {
       setError('Failed to load quizzes');
       console.error('Error loading quizzes:', error);
@@ -27,6 +28,7 @@ const QuizList = () => {
       setLoading(false);
     }
   };
+
 
   const handleDelete = async (id) => {
     try {

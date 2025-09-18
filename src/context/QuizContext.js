@@ -21,12 +21,13 @@ export const QuizProvider = ({ children }) => {
   const [error, setError] = useState('');
 
   // Load all quizzes
-  const loadAllQuizzes = async () => {
+    const loadAllQuizzes = async () => {
     try {
       setLoading(true);
       const data = await quizService.getAllQuizzes();
-      setQuizzes(data);
-      return data;
+      const arr = Array.isArray(data) ? data : (data.quizzes || []);
+      setQuizzes(arr);
+      return arr;
     } catch (error) {
       setError('Failed to load quizzes');
       console.error('Error loading quizzes:', error);
@@ -35,6 +36,7 @@ export const QuizProvider = ({ children }) => {
       setLoading(false);
     }
   };
+
 
   // Load user-specific quiz data
   const loadUserQuizData = async () => {
